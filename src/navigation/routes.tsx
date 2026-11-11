@@ -8,6 +8,7 @@ import { AdminTransactionsPage } from '../pages/admin/AdminTransactionsPage'
 import { AdminUsersPage } from '../pages/admin/AdminUsersPage'
 import { useLocation, useNavigate } from './RouterContext'
 import { PATHS, type AppPath } from './paths'
+import HeroSection from '../components/HeroSection'
 
 export type RouteLayout = 'public' | 'admin'
 
@@ -43,6 +44,12 @@ export const ROUTES: readonly RouteConfig[] = [
     title: 'Articles & Essays | Admin Dashboard — The Tech Report',
     layout: 'admin',
     component: AdminBlogsPage,
+  },
+    {
+    path: PATHS.AUTHOR,
+    title: 'About the Author | The Tech Report',
+    layout: 'public',
+    component: HeroSection,
   },
   {
     path: PATHS.ADMIN_TRANSACTIONS,

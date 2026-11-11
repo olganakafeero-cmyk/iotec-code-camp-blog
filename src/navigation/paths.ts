@@ -1,12 +1,15 @@
 import { FileText, ReceiptText, Users, type LucideIcon } from 'lucide-react'
 
-export const PATHS = {
+
+  export const PATHS = {
   LANDING: '/',
   BLOG_DETAILS: '/blog',
+  AUTHOR: '/author',
   ADMIN: '/admin',
   ADMIN_BLOGS: '/admin/blogs',
   ADMIN_TRANSACTIONS: '/admin/transactions',
   ADMIN_USERS: '/admin/users',
+
 } as const
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS]

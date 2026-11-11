@@ -1,3 +1,4 @@
+
 import { RouterProvider } from './navigation/RouterContext'
 import { AppRouter } from './navigation/routes'
 
@@ -6,6 +7,7 @@ function App() {
     <RouterProvider>
       <AppRouter />
     </RouterProvider>
+    
   )
 }
 

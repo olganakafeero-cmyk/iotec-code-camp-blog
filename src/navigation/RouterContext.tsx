@@ -11,6 +11,8 @@ import {
 } from 'react'
 import { PATHS, type AppPath } from './paths'
 
+
+
 interface NavigateOptions {
   replace?: boolean
 }
