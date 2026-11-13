@@ -240,3 +240,40 @@
     font-size: 32px;
   }
 }
+.author-page .photo-frame {
+  position: relative;
+}
+
+.author-page .photo-frame::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(252, 251, 249, 0), #fcfbf9);
+  pointer-events: none;
+}
+
+.author-page .photo-bar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  height: 14px;
+  background: #fff;
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.author-page .photo-frame::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 26px;
+  height: 7px;
+  background: #fff;
+  border-radius: 4px;
+  z-index: 2;
+}

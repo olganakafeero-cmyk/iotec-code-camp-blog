@@ -64,7 +64,9 @@ function HeroSection() {
         <div className="photo">
           <div className="photo-frame">
             <img src={authorImg} alt="Portrait of the author" />
-          </div>
+             <span className="photo-bar"></span>
+     </div>
+          
           <p className="name">Olgah Majorine</p>
                 <p className="role">software Engineer &amp Technology Enthusiast. Founder of the Tech Report</p>
             </div>
