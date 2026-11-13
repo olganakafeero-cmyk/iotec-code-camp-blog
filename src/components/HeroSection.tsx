@@ -4,54 +4,34 @@ import { PATHS } from '../navigation/paths'
 import './author.css'
 import authorImg from './author.jpg'
 
-const recentPosts = [
+
+    const recentPosts = [
   {
     id: 1,
-    category: 'Project Notes',
-    title: 'Building QueueLess: an appointment booking app from scratch',
+    category: 'Essay',
+    title: 'Technology is the architecture of ideas',
     excerpt:
-      'Why I chose React, Vite and Convex, and how bookings confirm instantly without double booking.',
+      'The apps we use are only the surface. A look at the logic and thinking that sit underneath them.',
     date: 'Nov 2026',
+    image: '/blog/architecture-of-ideas.jpg',
   },
   {
     id: 2,
-    category: 'Learning',
-    title: 'From classroom code to a live website in one weekend',
+    category: 'Perspective',
+    title: 'Why understanding technology matters as much as building it',
     excerpt:
-      'What changed when I pushed my first project to GitHub and deployed it on Vercel.',
+      'Curiosity and technical exploration come first. Creating is easier when you know why things work.',
     date: 'Nov 2026',
+    image: '/blog/understanding.jpg',
   },
   {
     id: 3,
-    category: 'Debugging',
-    title: 'The one missing semicolon that broke my whole stylesheet',
+    category: 'Reflection',
+    title: 'Depth over trends: examining technology with clarity and intention',
     excerpt:
-      'A beginner-friendly look at typos, error messages and how to read them calmly.',
-    date: 'Nov 2026',
-  },
-  {
-    id: 4,
-    category: 'Community',
-    title: 'What I am learning in the She Builds With ioTec code camp',
-    excerpt:
-      'Four Saturdays, one production-grade app, and the habits that make learning stick.',
-    date: 'Nov 2026',
-  },
-  {
-    id: 5,
-    category: 'Databases',
-    title: 'SQL tables vs Convex documents: what I noticed switching',
-    excerpt:
-      'How the way I learned MySQL in class helped me understand a modern backend.',
+      'No superficial hype. A slower way of looking at the tools that shape how we live and work.',
     date: 'Oct 2026',
-  },
-  {
-    id: 6,
-    category: 'Ideas',
-    title: 'Tech ideas for Uganda I want to build next',
-    excerpt:
-      'From a footballers directory to smart farming tools: the problems worth solving.',
-    date: 'Oct 2026',
+    image: '/blog/depth-and-clarity.jpg',
   },
 ]
 
@@ -68,7 +48,7 @@ function HeroSection() {
      </div>
           
           <p className="name">Olgah Majorine</p>
-                <p className="role">software Engineer &amp Technology Enthusiast. Founder of the Tech Report</p>
+                <p className="role">software Engineer &amp; Technology Enthusiast. Founder of the Tech Report</p>
             </div>
 
             <div className="text">
