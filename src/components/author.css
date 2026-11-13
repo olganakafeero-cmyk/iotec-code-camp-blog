@@ -1,17 +1,26 @@
-
-.author-page {
-  display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  gap: 48px;
+.author-wrap {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 60px 40px;
+  padding: 0 40px 80px;
   font-family: Arial, sans-serif;
   color: #222;
 }
 
+
+.author-page {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 80px;
+  align-items: start;
+  padding: 60px 0;
+}
+
+.author-page .photo {
+  position: sticky;
+  top: 120px;
+}
+
 .author-page .photo-frame {
-  position: relative;
   border-radius: 14px;
   overflow: hidden;
 }
@@ -19,41 +28,20 @@
 .author-page .photo-frame img {
   display: block;
   width: 100%;
-  height: 420px;
+  height: 480px;
   object-fit: cover;
   object-position: center 20%;
 }
 
-.author-page .photo-frame::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 40%;
-  background: linear-gradient(to bottom, rgba(248, 248, 250, 0), #f8f8fa);
-  pointer-events: none;
-}
-
-.author-page .photo-bar {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  height: 14px;
-  background: #fff;
-  border-radius: 8px;
-  z-index: 2;
-}
-
 .author-page .name {
-  font-size: 13px;
+  font-size: 22px;
   font-weight: bold;
-  margin: 12px 0 2px;
+  margin: 20px 0 6px;
 }
 
 .author-page .role {
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.6;
   color: #666;
   margin: 0;
 }
@@ -117,34 +105,11 @@
   margin-right: 6px;
 }
 
-.author-page .btn-link {
-  display: inline-block;
-  margin-top: 28px;
-  background: #1f4d2e;
-  color: #fff;
-  text-decoration: none;
-  font-size: 14px;
-  padding: 12px 24px;
-  border-radius: 999px;
-}
 
-.author-page .btn-link:hover {
-  background: #163a22;
-}
-
-@media (max-width: 800px) {
-  .author-page {
-    grid-template-columns: 1fr;
-  }
-  .author-page h1 {
-    font-size: 32px;
-  }
-}
-.author-page .cta-btn {
+.cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 28px;
   background: #1f4d2e;
   color: #fff;
   border: none;
@@ -157,16 +122,121 @@
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.author-page .cta-btn:hover {
+.cta-btn:hover {
   background: #163a22;
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(31, 77, 46, 0.3);
 }
 
-.author-page .cta-btn svg {
+.cta-btn svg {
   transition: transform 0.2s;
 }
 
-.author-page .cta-btn:hover svg {
+.cta-btn:hover svg {
   transform: translateX(4px);
+}
+
+
+.recent {
+  border-top: 1px solid #e3e1dc;
+  padding-top: 60px;
+}
+
+.recent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.recent .label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #666;
+  margin: 0 0 8px;
+}
+
+.recent .label.red {
+  color: #a8432d;
+}
+
+.recent h2 {
+  font-family: Georgia, serif;
+  font-size: 36px;
+  font-weight: normal;
+  margin: 0;
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.post-card {
+  background: #fff;
+  border: 1px solid #e8e6e1;
+  border-radius: 14px;
+  padding: 24px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.post-meta {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #a8432d;
+  margin: 0 0 12px;
+}
+
+.post-card h3 {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: normal;
+  line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.post-excerpt {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #777;
+  margin: 0 0 16px;
+}
+
+.post-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f4d2e;
+}
+
+
+@media (max-width: 800px) {
+  .author-wrap {
+    padding: 0 20px 60px;
+  }
+
+  .author-page {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .author-page .photo {
+    position: static;
+  }
+
+  .author-page h1 {
+    font-size: 32px;
+  }
 }
