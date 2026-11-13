@@ -121,10 +121,15 @@ function HeroSection() {
         <div className="post-grid">
           {recentPosts.map((post) => (
             <article
-              key={post.id}
+             key={post.id}
               className="post-card"
               onClick={() => navigate(PATHS.BLOG_DETAILS)}
             >
+              <img
+                 src={post.image}
+                 alt={post.title}
+                 className="post-image"
+              />
               <p className="post-meta">
                 {post.category} &middot; {post.date}
               </p>
