@@ -23,9 +23,9 @@ export interface RouteConfig {
 export const ROUTES: readonly RouteConfig[] = [
   {
     path: PATHS.LANDING,
-    title: 'The Tech Report — Notes on Technology, Architecture & Culture',
+    title: 'Olgah Majorine | The Tech Report',
     layout: 'public',
-    component: LandingPage,
+    component: HeroSection,
   },
   {
     path: PATHS.BLOG_DETAILS,
