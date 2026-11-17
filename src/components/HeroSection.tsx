@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { useNavigate } from '../navigation/RouterContext'
 import { PATHS } from '../navigation/paths'
 import './author.css'
-import authorImg from './author.jpg'
+
 
 
     const recentPosts = [
@@ -43,7 +43,7 @@ function HeroSection() {
       <section className="author-page">
         <div className="photo">
           <div className="photo-frame">
-            <img src={authorImg} alt="Portrait of the author" />
+            <img src="/author.jpg" alt="Portrait of Olgah Majorine" />
              <span className="photo-bar"></span>
      </div>
           
@@ -55,7 +55,8 @@ function HeroSection() {
                 <p className="label">Authorial Focus</p>
 
                 <h1>
-                   Exploring the architecture of <em>technology</em>, one idea at a time.
+                   Exploring the architecture of <em>technology</em>, 
+                   one idea at a time.
                 </h1>
                 <p className="lead">
                     Technology is more than the applications we use and the systems we build.

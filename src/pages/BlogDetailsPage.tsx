@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useNavigate } from '../navigation/RouterContext'
 import { PATHS } from '../navigation/paths'
 import { posts, getSelectedPost, selectPost } from '../lib/posts'
-import authorImg from '../components/author.jpg'
 import './blog-details.css'
 
 export function BlogDetailsPage() {
@@ -41,7 +40,7 @@ export function BlogDetailsPage() {
         <h1 className="bd-title">{post.title}</h1>
 
         <div className="bd-byline">
-          <img src={authorImg} alt="Olgah Majorine" />
+        <img src="/author.jpg" alt="Portrait of Olgah Majorine" />
           <div>
             <p className="bd-author">Olgah Majorine</p>
             <p className="bd-meta">
@@ -62,7 +61,7 @@ export function BlogDetailsPage() {
         </div>
 
         <div className="bd-authorcard">
-          <img src={authorImg} alt="Olgah Majorine" />
+          <img src="/author.jpg" alt="Portrait of Olgah Majorine" />
           <div>
             <p className="bd-author">Written by Olgah Majorine</p>
             <p className="bd-meta">
