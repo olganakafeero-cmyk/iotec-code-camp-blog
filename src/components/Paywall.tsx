@@ -8,7 +8,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { restoreAccess, unlockPost } from '../lib/access'
-import './paywall.css'
+import './Paywall.css'
 
 const PRICE = 'UGX 9,500'
 
