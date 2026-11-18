@@ -1,0 +1,393 @@
+.pwd-dialog {
+  padding: 22px;
+}
+
+.pay-card {
+  background: #fdfcf9;
+  border: 1px solid #eeede8;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+  padding: 30px 24px 26px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: #222;
+}
+
+.pay-lock {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 14px;
+  border-radius: 10px;
+  background: #fff3d6;
+  border: 1px solid #f3dfae;
+  color: #c47a12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay-title {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: normal;
+  line-height: 1.3;
+  margin: 0 0 14px;
+}
+
+.pay-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff8e6;
+  border: 1px solid #f3e2b8;
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 22px;
+}
+
+.pay-price span {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #8a8472;
+}
+
+.pay-price strong {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  color: #b4540a;
+}
+
+.pay-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f2f1ed;
+  border: 1px solid #e9e7e1;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 22px;
+}
+
+.pay-tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #777;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.pay-tabs button.active {
+  background: #fff;
+  color: #2f5bd8;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pay-form {
+  text-align: left;
+}
+
+.pay-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #777;
+  margin: 0 0 10px;
+}
+
+.pay-networks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pay-networks button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #e6e4de;
+  background: #f6f5f1;
+  border-radius: 8px;
+  padding: 11px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+}
+
+.pay-networks button.active {
+  border-color: #2f5bd8;
+  background: #eef3ff;
+}
+
+.pay-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pay-dot.mtn {
+  background: #f5b800;
+}
+
+.pay-dot.airtel {
+  background: #e4002b;
+}
+
+.pay-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+  margin: 18px 0 8px;
+}
+
+.pay-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f6f5f1;
+  border: 1px solid #e6e4de;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #777;
+}
+
+.pay-input:focus-within {
+  border-color: #2f5bd8;
+}
+
+.pay-input input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  padding: 11px 0;
+  outline: none;
+  color: #222;
+}
+
+.pay-cc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 10px;
+  border-right: 1px solid #e0ded8;
+}
+
+.pay-cc select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  padding: 11px 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.pay-hint {
+  font-size: 10px;
+  color: #999;
+  margin: 6px 0 0;
+}
+
+.pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+  background: #2f5bd8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: #2449b3;
+}
+
+.pay-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pay-prompt {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #f6f5f1;
+  border: 1px solid #ecebe5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 16px;
+  color: #d98a1b;
+}
+
+.pay-prompt p {
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0;
+}
+
+.pay-prompt strong {
+  color: #333;
+}
+
+.pay-demo {
+  font-size: 10px;
+  color: #aaa;
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+.pay-error {
+  font-size: 12px;
+  color: #b42318;
+  margin: 12px 0 0;
+}
+
+@media (max-width: 520px) {
+  .pwd-dialog {
+    padding: 12px;
+  }
+
+  .pay-card {
+    padding: 24px 16px 20px;
+  }
+
+  .pay-price {
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 14px;
+  }
+}
+/* ===== Dialog over the page ===== */
+.pwd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 22, 32, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: pwd-fade 0.2s ease;
+}
+
+.pwd-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  outline: none;
+  animation: pwd-pop 0.25s ease;
+}
+
+.pwd-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f3f7;
+  border: none;
+  border-radius: 50%;
+  color: #555;
+  cursor: pointer;
+}
+
+.pwd-close:hover {
+  background: #e8e7ee;
+  color: #222;
+}
+
+@keyframes pwd-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pwd-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pwd-overlay,
+  .pwd-dialog {
+    animation: none;
+  }
+}
+
+/* ===== Bar shown after the dialog is closed ===== */
+.bd-lockbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff8e8;
+  border: 1px solid #f3e2b8;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 8px 0 48px;
+  color: #b4540a;
+}
+
+.bd-lockbar p {
+  flex: 1;
+  min-width: 180px;
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.bd-lockbar button {
+  background: #2f5bd8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bd-lockbar button:hover {
+  background: #2449b3;
+}
