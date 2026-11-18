@@ -64,7 +64,20 @@ export function BlogDetailsPage() {
         </figure>
 
         <div className="bd-author-row">
-          <img src="/author.jpg" alt="Portrait of Olgah Majorine" />
+          <img
+            src="/author.jpg"
+             alt="Portrait of Olgah Majorine"
+              width={44}
+                height={44}
+                   style={{
+                     width: 44,
+                       height: 44,
+                       borderRadius: '50%',
+                        objectFit: 'cover',
+                          objectPosition: 'center 20%',
+                               flexShrink: 0,
+              }}
+/>
           <div>
             <p className="bd-author">Olgah Majorine</p>
             <p className="bd-meta">Software Engineer &middot; The Tech Report</p>
