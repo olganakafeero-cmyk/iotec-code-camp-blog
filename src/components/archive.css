@@ -222,3 +222,9 @@
     font-size: 30px;
   }
 }
+.archive-empty {
+  font-size: 14px;
+  color: #888;
+  padding: 24px 0;
+  margin: 0;
+}

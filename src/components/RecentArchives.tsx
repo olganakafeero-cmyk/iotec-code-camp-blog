@@ -1,27 +1,43 @@
 import { useState } from 'react'
+import { useQuery } from 'convex/react'
 import { Archive, ArrowLeft, ArrowRight } from 'lucide-react'
+import { api } from '../../convex/_generated/api'
 import { useNavigate } from '../navigation/RouterContext'
 import { PATHS } from '../navigation/paths'
-import { posts, selectPost } from '../lib/posts'
+import { CATEGORIES, labelOf } from '../lib/blog-options'
+import { selectBlog } from '../lib/selected-blog'
 import './archive.css'
 
-const FILTERS = ['All', 'Architecture', 'Technology'] as const
+const FILTERS = ['all', ...CATEGORIES] as const
 type Filter = (typeof FILTERS)[number]
 
 const PAGE_SIZE = 3
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
+const formatDate = (timestamp: number) =>
+  new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+
 export default function RecentArchive() {
   const navigate = useNavigate()
-  const [filter, setFilter] = useState<Filter>('All')
+  const blogs = useQuery(api.blogs.listPublished)
+  const [filter, setFilter] = useState<Filter>('all')
   const [page, setPage] = useState(0)
 
+  const all = blogs ?? []
   const filtered =
-    filter === 'All' ? posts : posts.filter((post) => post.category === filter)
+    filter === 'all' ? all : all.filter((blog) => blog.category === filter)
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const visible = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
+  const currentPage = Math.min(page, pageCount - 1)
+  const visible = filtered.slice(
+    currentPage * PAGE_SIZE,
+    currentPage * PAGE_SIZE + PAGE_SIZE,
+  )
 
   const changeFilter = (next: Filter) => {
     setFilter(next)
@@ -51,28 +67,28 @@ export default function RecentArchive() {
                   }
                   onClick={() => changeFilter(item)}
                 >
-                  {item}
+                  {labelOf(item)}
                 </button>
               ))}
             </div>
 
             <div className="archive-pager">
               <span className="archive-count">
-                {pad(page + 1)} / {pad(pageCount)}
+                {pad(currentPage + 1)} / {pad(pageCount)}
               </span>
               <button
                 type="button"
                 aria-label="Previous page"
-                disabled={page === 0}
-                onClick={() => setPage(page - 1)}
+                disabled={currentPage === 0}
+                onClick={() => setPage(currentPage - 1)}
               >
                 <ArrowLeft size={16} />
               </button>
               <button
                 type="button"
                 aria-label="Next page"
-                disabled={page >= pageCount - 1}
-                onClick={() => setPage(page + 1)}
+                disabled={currentPage >= pageCount - 1}
+                onClick={() => setPage(currentPage + 1)}
               >
                 <ArrowRight size={16} />
               </button>
@@ -80,40 +96,52 @@ export default function RecentArchive() {
           </div>
         </div>
 
+        {blogs === undefined && <p className="archive-empty">Loading blogs...</p>}
+
+        {blogs !== undefined && visible.length === 0 && (
+          <p className="archive-empty">
+            {all.length === 0
+              ? 'No published blogs yet. Check back soon.'
+              : 'No blogs in this category yet.'}
+          </p>
+        )}
+
         <div className="archive-grid">
-          {visible.map((post) => (
+          {visible.map((blog) => (
             <article
-              key={post.id}
+              key={blog._id}
               className="archive-card"
               onClick={() => {
-                selectPost(post.id)
+                selectBlog(blog.slug)
                 navigate(PATHS.BLOG_DETAILS)
               }}
             >
               <div className="archive-image">
-                <img src={post.image} alt={post.title} loading="lazy" />
+                {blog.coverImageUrl && (
+                  <img src={blog.coverImageUrl} alt={blog.title} loading="lazy" />
+                )}
               </div>
 
               <div className="archive-body">
                 <div className="archive-tags">
-                  <span className="archive-tag">{post.category}</span>
+                  <span className="archive-tag">{labelOf(blog.category)}</span>
                   <span
                     className={
-                      post.access === 'Paid'
+                      blog.subscriptionMode === 'paid'
                         ? 'archive-badge paid'
                         : 'archive-badge free'
                     }
                   >
-                    {post.access}
+                    {blog.subscriptionMode === 'paid' ? 'Paid' : 'Free'}
                   </span>
                 </div>
 
                 <p className="archive-meta">
-                  {post.date} &middot; {post.readTime}
+                  {formatDate(blog.updatedAt)} &middot; {blog.readTime}
                 </p>
 
-                <h3>{post.title}</h3>
-                <p className="archive-excerpt">{post.excerpt}</p>
+                <h3>{blog.title}</h3>
+                <p className="archive-excerpt">{blog.excerpt}</p>
 
                 <span className="archive-link">
                   Read <ArrowRight size={14} />

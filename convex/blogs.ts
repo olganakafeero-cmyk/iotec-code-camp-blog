@@ -79,4 +79,13 @@ export const list = query({
   args: {},
   handler: async (ctx) => ctx.db.query("blogs").order("desc").collect(),
 });
+export const listPublished = query({
+  args: {},
+  handler: async (ctx) =>
+    ctx.db
+      .query("blogs")
+      .order("desc")
+      .filter((q) => q.eq(q.field("status"), "published"))
+      .collect(),
+});
 
