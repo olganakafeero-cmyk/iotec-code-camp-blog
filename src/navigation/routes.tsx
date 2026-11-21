@@ -9,6 +9,7 @@ import { AdminUsersPage } from '../pages/admin/AdminUsersPage'
 import { useLocation, useNavigate } from './RouterContext'
 import { PATHS, type AppPath } from './paths'
 import HeroSection from '../components/HeroSection'
+import { CreateBlogPage } from '../pages/admin/CreateBlogPage'
 
 export type RouteLayout = 'public' | 'admin'
 
@@ -44,6 +45,12 @@ export const ROUTES: readonly RouteConfig[] = [
     title: 'Articles & Essays | Admin Dashboard — The Tech Report',
     layout: 'admin',
     component: AdminBlogsPage,
+  },
+    {
+    path: PATHS.ADMIN_BLOGS_NEW,
+    title: 'Create New Blog | Admin Dashboard — The Tech Report',
+    layout: 'admin',
+    component: CreateBlogPage,
   },
     {
     path: PATHS.AUTHOR,

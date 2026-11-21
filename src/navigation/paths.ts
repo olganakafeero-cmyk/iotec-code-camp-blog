@@ -9,6 +9,7 @@ import { FileText, ReceiptText, Users, type LucideIcon } from 'lucide-react'
   ADMIN_BLOGS: '/admin/blogs',
   ADMIN_TRANSACTIONS: '/admin/transactions',
   ADMIN_USERS: '/admin/users',
+  ADMIN_BLOGS_NEW: '/admin/blogs/new',
 
 } as const
 
