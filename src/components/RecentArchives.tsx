@@ -5,7 +5,7 @@ import { api } from '../../convex/_generated/api'
 import { useNavigate } from '../navigation/RouterContext'
 import { PATHS } from '../navigation/paths'
 import { CATEGORIES, labelOf } from '../lib/blog-options'
-import { selectBlog } from '../lib/selected-blog'
+import { selectBlog } from '../lib/selected-blogs'
 import './archive.css'
 
 const FILTERS = ['all', ...CATEGORIES] as const
