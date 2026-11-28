@@ -202,3 +202,15 @@
     font-size: 32px;
   }
 }
+.bd-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eef3ff;
+  border: 1px solid #cdd9fb;
+  color: #2f5bd8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useAction, useQuery } from 'convex/react'
+import { ConvexError } from 'convex/values'
 import {
   AtSign,
   Check,
@@ -7,61 +9,125 @@ import {
   Smartphone,
   Sparkles,
 } from 'lucide-react'
-import { restoreAccess, unlockPost } from '../lib/access'
-import './Paywall.css'
-
-const PRICE = 'UGX 9,500'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
+import './paywall.css'
 
 type Tab = 'new' | 'restore'
 type Network = 'MTN MoMo' | 'Airtel Money'
 
 interface PaywallProps {
-  postId: number
-  onUnlocked: () => void
+  blogId: Id<'blogs'>
+  amount: number
+  onUnlocked: (transactionId: string) => void
 }
 
-const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-const cleanPhone = (value: string) => value.replace(/\D/g, '').replace(/^0/, '')
-const isPhone = (value: string) => /^7\d{8}$/.test(cleanPhone(value))
+const POLL_MS = 3000
+const POLL_LIMIT = 40 // about two minutes
 
-export default function Paywall({ postId, onUnlocked }: PaywallProps) {
+const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const messageFrom = (error: unknown) =>
+  error instanceof ConvexError && typeof error.data === 'string'
+    ? error.data
+    : 'Something went wrong. Please try again.'
+
+export default function Paywall({ blogId, amount, onUnlocked }: PaywallProps) {
+  const initiateCollection = useAction(api.iotecPay.iotecPayActions.initiateCollection)
+  const checkCollectionStatus = useAction(api.iotecPay.iotecPayActions.checkCollectionStatus)
+  const restoreAccess = useAction(api.iotecPay.iotecPayActions.restoreAccess)
+  const currency = useQuery(api.blogs.paymentCurrency)
+
   const [tab, setTab] = useState<Tab>('new')
   const [network, setNetwork] = useState<Network>('MTN MoMo')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [waiting, setWaiting] = useState(false)
-  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState('')
+  const [error, setError] = useState('')
+  const mounted = useRef(true)
 
-  const canPay = isEmail(email) && isPhone(phone) && !waiting
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+
+  const canPay =
+    isEmail(email) && phone.replace(/\D/g, '').length === 10 && !busy && Boolean(currency)
 
   const switchTab = (next: Tab) => {
     setTab(next)
-    setMessage('')
+    setError('')
+    setProgress('')
   }
 
-  const pay = () => {
+  const waitForPayment = async (transactionId: Id<'transactions'>, first: string) => {
+    let current = first
+    for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
+      if (current === 'completed') {
+        onUnlocked(transactionId)
+        return
+      }
+      if (current === 'failed') {
+        setError('The payment was not approved. Please try again.')
+        return
+      }
+      setProgress('Waiting for approval on your phone…')
+      await sleep(POLL_MS)
+      if (!mounted.current) return
+      const result = await checkCollectionStatus({ transactionId })
+      current = result.status
+      if (current === 'failed' && result.message) {
+        setError(result.message)
+        return
+      }
+    }
+    setError(
+      'We have not received a confirmation yet. If you approved the prompt, wait a minute and use "Returning Reader" with your email.',
+    )
+  }
+
+  const pay = async () => {
     if (!canPay) return
-    setMessage('')
-    setWaiting(true)
-    // DEMO ONLY: replace this timer with a real payment request to your
-    // backend (for example a Convex action calling a payment provider).
-    window.setTimeout(() => {
-      unlockPost(postId, email)
-      setWaiting(false)
-      onUnlocked()
-    }, 2000)
+    setError('')
+    setBusy(true)
+    setProgress('Sending the payment request to your phone…')
+    try {
+      const result = await initiateCollection({ blogId, phoneNumber: phone, email })
+      await waitForPayment(result.transactionId, result.status)
+    } catch (caught) {
+      if (mounted.current) setError(messageFrom(caught))
+    } finally {
+      if (mounted.current) {
+        setBusy(false)
+        setProgress('')
+      }
+    }
   }
 
-  const restore = () => {
+  const restore = async () => {
     if (!isEmail(email)) {
-      setMessage('Enter the email you used when you unlocked.')
+      setError('Enter the email you used when you paid.')
       return
     }
-    if (restoreAccess(email).length === 0) {
-      setMessage('No access found for that email on this device.')
-      return
+    setError('')
+    setBusy(true)
+    setProgress('Checking your payment…')
+    try {
+      const transactionId = await restoreAccess({ blogId, email })
+      if (!mounted.current) return
+      if (transactionId) onUnlocked(transactionId)
+      else setError('No completed payment was found for that email on this blog.')
+    } catch (caught) {
+      if (mounted.current) setError(messageFrom(caught))
+    } finally {
+      if (mounted.current) {
+        setBusy(false)
+        setProgress('')
+      }
     }
-    onUnlocked()
   }
 
   return (
@@ -74,7 +140,9 @@ export default function Paywall({ postId, onUnlocked }: PaywallProps) {
 
       <div className="pay-price">
         <span>ONE-TIME READER CONTRIBUTION</span>
-        <strong>{PRICE}</strong>
+        <strong>
+          {currency ?? ''} {amount.toLocaleString()}
+        </strong>
       </div>
 
       <div className="pay-tabs">
@@ -93,6 +161,10 @@ export default function Paywall({ postId, onUnlocked }: PaywallProps) {
           Returning Reader (Restore)
         </button>
       </div>
+
+      {currency === null && (
+        <p className="pay-error">Payments are not available right now.</p>
+      )}
 
       {tab === 'new' && (
         <div className="pay-form">
@@ -147,25 +219,20 @@ export default function Paywall({ postId, onUnlocked }: PaywallProps) {
             <input
               id="pay-phone"
               type="tel"
-              placeholder="0771234567"
+              placeholder={currency === 'ITX' ? '0111777770' : '0771234567'}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
           <p className="pay-hint">
-            Direct authorization; standard network tariffs apply.
+            {currency === 'ITX'
+              ? 'Test mode: use a test number from 0111777770 to 0111777779.'
+              : 'Direct authorization; standard network tariffs apply.'}
           </p>
 
-          <button
-            type="button"
-            className="pay-btn"
-            disabled={!canPay}
-            onClick={pay}
-          >
+          <button type="button" className="pay-btn" disabled={!canPay} onClick={pay}>
             <Lock size={14} />
-            {waiting
-              ? 'Waiting for approval on your phone…'
-              : 'Pay via Mobile Money & Read Now'}
+            {busy ? 'Processing…' : 'Pay via Mobile Money & Read Now'}
           </button>
 
           <div className="pay-prompt">
@@ -176,10 +243,6 @@ export default function Paywall({ postId, onUnlocked }: PaywallProps) {
               secret Mobile Money PIN to approve the transaction.
             </p>
           </div>
-
-          <p className="pay-demo">
-            Demo mode: no money is taken and nothing is sent anywhere.
-          </p>
         </div>
       )}
 
@@ -198,16 +261,16 @@ export default function Paywall({ postId, onUnlocked }: PaywallProps) {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <p className="pay-hint">
-            Enter the email you used when you first unlocked.
-          </p>
+          <p className="pay-hint">Enter the email you used when you paid for this blog.</p>
 
-          <button type="button" className="pay-btn" onClick={restore}>
-            <Check size={14} /> Restore my access
+          <button type="button" className="pay-btn" disabled={busy} onClick={restore}>
+            <Check size={14} /> {busy ? 'Checking…' : 'Restore my access'}
           </button>
-          {message && <p className="pay-error">{message}</p>}
         </div>
       )}
+
+      {progress && <p className="pay-status">{progress}</p>}
+      {error && <p className="pay-error">{error}</p>}
     </div>
   )
 }

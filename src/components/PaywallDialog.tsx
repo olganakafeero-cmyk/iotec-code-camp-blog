@@ -1,16 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import type { Id } from '../../convex/_generated/dataModel'
 import Paywall from './Paywall'
 
 interface PaywallDialogProps {
-  postId: number
-  onUnlocked: () => void
+  blogId: Id<'blogs'>
+  amount: number
+  onUnlocked: (transactionId: string) => void
   onClose: () => void
 }
 
 export default function PaywallDialog({
-  postId,
+  blogId,
+  amount,
   onUnlocked,
   onClose,
 }: PaywallDialogProps) {
@@ -57,7 +60,7 @@ export default function PaywallDialog({
         >
           <X size={18} />
         </button>
-        <Paywall postId={postId} onUnlocked={onUnlocked} />
+        <Paywall blogId={blogId} amount={amount} onUnlocked={onUnlocked} />
       </div>
     </div>,
     document.body,

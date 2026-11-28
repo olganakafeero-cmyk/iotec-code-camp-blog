@@ -1,33 +1,22 @@
-const IDS_KEY = 'unlockedPosts'
-const EMAIL_KEY = 'readerEmail'
+const KEY = 'paidBlogAccess'
 
-export function getUnlocked(): number[] {
+export type AccessMap = Record<string, string>
+
+export function getAccess(): AccessMap {
   try {
-    const raw = localStorage.getItem(IDS_KEY)
-    return raw ? (JSON.parse(raw) as number[]) : []
+    const raw = localStorage.getItem(KEY)
+    return raw ? (JSON.parse(raw) as AccessMap) : {}
   } catch {
-    return []
+    return {}
   }
 }
 
-export function unlockPost(id: number, email: string) {
+export function saveAccess(slug: string, transactionId: string): AccessMap {
+  const next = { ...getAccess(), [slug]: transactionId }
   try {
-    const ids = new Set(getUnlocked())
-    ids.add(id)
-    localStorage.setItem(IDS_KEY, JSON.stringify(Array.from(ids)))
-    localStorage.setItem(EMAIL_KEY, email.toLowerCase())
+    localStorage.setItem(KEY, JSON.stringify(next))
   } catch {
     // storage unavailable
   }
-}
-
-export function restoreAccess(email: string): number[] {
-  try {
-    if (localStorage.getItem(EMAIL_KEY) === email.toLowerCase()) {
-      return getUnlocked()
-    }
-  } catch {
-    // storage unavailable
-  }
-  return []
+  return next
 }

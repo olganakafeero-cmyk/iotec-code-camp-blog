@@ -1,141 +1,223 @@
-import { useCallback, useState } from 'react'
-import { ArrowLeft, ArrowRight, Clock, Lock } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { useQuery } from 'convex/react'
+import DOMPurify from 'dompurify'
+import { ArrowLeft, ArrowRight, Clock, Eye } from 'lucide-react'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 import { useNavigate } from '../navigation/RouterContext'
 import { PATHS } from '../navigation/paths'
-import { posts, getSelectedPost, selectPost } from '../lib/posts'
-import { getUnlocked } from '../lib/access'
+import { getAccess, saveAccess } from '../lib/access'
+import { labelOf } from '../lib/blog-options'
+import { getSelectedSlug, isPreview, selectBlog } from '../lib/selected-blogs'
+import Paywall from '../components/Paywall'
 import PaywallDialog from '../components/PaywallDialog'
 import './blog-details.css'
 
+const formatDate = (timestamp: number) =>
+  new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+
 export function BlogDetailsPage() {
   const navigate = useNavigate()
-  const [post, setPost] = useState(getSelectedPost)
-  const [unlockedIds, setUnlockedIds] = useState(getUnlocked)
+  const [slug, setSlug] = useState(getSelectedSlug)
+  const [preview, setPreview] = useState(isPreview)
+  const [access, setAccess] = useState(getAccess)
   const [dialogOpen, setDialogOpen] = useState(true)
 
-  const unlocked = post.access === 'Free' || unlockedIds.includes(post.id)
-  const intro = post.body.slice(0, 2)
-  const rest = post.body.slice(2)
-  const related = posts.filter((p) => p.id !== post.id).slice(0, 2)
+  // Readers get published blogs only; the admin preview gets any blog.
+  const publicBlog = useQuery(api.blogs.getBySlug, slug && !preview ? { slug } : 'skip')
+  const adminBlog = useQuery(api.blogs.getForAdmin, slug && preview ? { slug } : 'skip')
+  const blog = preview ? adminBlog : publicBlog
+  const published = useQuery(api.blogs.listPublished)
+
+  const transactionId = blog ? access[blog.slug] : undefined
+  const isFree = blog?.subscriptionMode === 'free'
+
+  const paidContent = useQuery(
+    api.blogs.getPaidContent,
+    !preview && blog && blog.subscriptionMode === 'paid' && transactionId
+      ? { blogId: blog._id, transactionId: transactionId as Id<'transactions'> }
+      : 'skip',
+  )
+
+  const checkingAccess =
+    !preview &&
+    Boolean(transactionId) &&
+    blog?.subscriptionMode === 'paid' &&
+    paidContent === undefined
+  const unlocked = Boolean(blog) && (preview || isFree || typeof paidContent === 'string')
+  const fullHtml =
+    preview || isFree ? (blog?.fullContentHtml ?? '') : (paidContent ?? '')
+
+  const html = useMemo(
+    () =>
+      blog
+        ? DOMPurify.sanitize(unlocked ? fullHtml : blog.previewContentHtml)
+        : '',
+    [blog, unlocked, fullHtml],
+  )
+
+  const related = (published ?? []).filter((item) => item.slug !== slug).slice(0, 2)
 
   const closeDialog = useCallback(() => setDialogOpen(false), [])
+  const goBack = () => navigate(preview ? PATHS.ADMIN_BLOGS : PATHS.LANDING)
+  const backLabel = preview ? 'Back to admin blogs' : 'Back to all blogs'
 
-  const openPost = (id: number) => {
-    selectPost(id)
-    setPost(getSelectedPost())
+  const onUnlocked = (newTransactionId: string) => {
+    if (blog) setAccess(saveAccess(blog.slug, newTransactionId))
+  }
+
+  const openBlog = (nextSlug: string) => {
+    selectBlog(nextSlug)
+    setSlug(nextSlug)
+    setPreview(false)
     setDialogOpen(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  if (!slug || blog === null) {
+    return (
+      <article className="bd-page">
+        <div className="bd-container">
+          <p className="bd-state">
+            {slug ? 'This blog could not be found.' : 'Choose a blog from the home page.'}
+          </p>
+          <button type="button" className="bd-back" onClick={goBack}>
+            <ArrowLeft size={16} /> {backLabel}
+          </button>
+        </div>
+      </article>
+    )
+  }
+
+  if (blog === undefined) {
+    return (
+      <article className="bd-page">
+        <div className="bd-container">
+          <p className="bd-state">Loading blog...</p>
+        </div>
+      </article>
+    )
   }
 
   return (
     <article className="bd-page">
       <div className="bd-container">
-        <button
-          type="button"
-          className="bd-back"
-          onClick={() => navigate(PATHS.LANDING)}
-        >
-          <ArrowLeft size={16} /> Back to all blogs
+        <button type="button" className="bd-back" onClick={goBack}>
+          <ArrowLeft size={16} /> {backLabel}
         </button>
+
+        {preview && (
+          <div className="bd-preview">
+            <Eye size={14} /> Admin preview &middot; status: {blog.status}. Readers see
+            this page only when the blog is published.
+          </div>
+        )}
 
         <div className="bd-topline">
           <div className="bd-tags">
             <span
-              className={post.access === 'Paid' ? 'bd-tag exclusive' : 'bd-tag free'}
+              className={
+                blog.subscriptionMode === 'paid' ? 'bd-tag exclusive' : 'bd-tag free'
+              }
             >
-              {post.access === 'Paid' ? 'Subscriber exclusive' : 'Free to read'}
+              {blog.subscriptionMode === 'paid' ? 'Subscriber exclusive' : 'Free to read'}
             </span>
-            <span className="bd-tag topic">{post.topic}</span>
+            <span className="bd-tag topic">{labelOf(blog.category)}</span>
           </div>
           <div className="bd-info">
             <span>
-              <Clock size={13} /> {post.readTime}
+              <Clock size={13} /> {blog.readTime}
             </span>
-            <span>{post.date}</span>
+            <span>{formatDate(blog.updatedAt)}</span>
           </div>
         </div>
 
-        <h1 className="bd-title">{post.title}</h1>
-        <p className="bd-deck">{post.excerpt}</p>
+        <h1 className="bd-title">{blog.title}</h1>
+        <p className="bd-deck">{blog.subtitle}</p>
 
-        <figure className="bd-cover">
-          <img src={post.image} alt={post.title} />
-          <figcaption>{post.caption}</figcaption>
-        </figure>
+        {blog.coverImageUrl && (
+          <figure className="bd-cover">
+            <img src={blog.coverImageUrl} alt={blog.coverImageData.alt} />
+            {blog.coverImageData.caption && (
+              <figcaption>{blog.coverImageData.caption}</figcaption>
+            )}
+          </figure>
+        )}
 
         <div className="bd-author-row">
-          <img
-            src="/author.jpg"
-             alt="Portrait of Olgah Majorine"
-              width={44}
-                height={44}
-                   style={{
-                     width: 44,
-                       height: 44,
-                       borderRadius: '50%',
-                        objectFit: 'cover',
-                          objectPosition: 'center 20%',
-                               flexShrink: 0,
-              }}
+        <img
+        src="/author.jpg"
+          alt="Portrait of the author"
+          width={44}
+            height={44}
+             style={{
+                width: 44,
+                 height: 44,
+               borderRadius: '50%',
+                 objectFit: 'cover',
+               objectPosition: 'center 20%',
+               flexShrink: 0,
+  }}
 />
           <div>
-            <p className="bd-author">Olgah Majorine</p>
-            <p className="bd-meta">Software Engineer &middot; The Tech Report</p>
+            <p className="bd-author">{blog.author?.name ?? 'The Tech Report'}</p>
+            <p className="bd-meta">{blog.author?.role ?? 'Editor'} &middot; The Tech Report</p>
           </div>
         </div>
 
         <div className="bd-body">
-          {intro.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-
-          <blockquote className="bd-quote">
-            <p>&ldquo;{post.quote.text}&rdquo;</p>
-            <cite>&mdash; {post.quote.source}</cite>
-          </blockquote>
-
-          {unlocked ? (
-            rest.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-          ) : (
-            <p className="bd-fade">{rest[0]}</p>
-          )}
+          <div
+            className={unlocked ? 'bd-html' : 'bd-html bd-teaser'}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </div>
 
-        {!unlocked && !dialogOpen && (
-          <div className="bd-lockbar">
-            <Lock size={16} />
-            <p>This essay is for supporters. Unlock it to keep reading.</p>
-            <button type="button" onClick={() => setDialogOpen(true)}>
-              Unlock full essay
-            </button>
+        {!unlocked && !checkingAccess && !dialogOpen && (
+          <div className="bd-inline-card">
+            <Paywall
+              blogId={blog._id}
+              amount={blog.price.amount}
+              onUnlocked={onUnlocked}
+            />
           </div>
         )}
 
-        <h2 className="bd-related-title">Keep reading</h2>
-        <div className="bd-related">
-          {related.map((item) => (
-            <div
-              key={item.id}
-              className="bd-related-card"
-              onClick={() => openPost(item.id)}
-            >
-              <img src={item.image} alt={item.title} loading="lazy" />
-              <div>
-                <p className="bd-mini-tag">{item.topic}</p>
-                <h3>{item.title}</h3>
-                <span className="bd-more">
-                  Read <ArrowRight size={14} />
-                </span>
-              </div>
+        {!preview && related.length > 0 && (
+          <>
+            <h2 className="bd-related-title">Keep reading</h2>
+            <div className="bd-related">
+              {related.map((item) => (
+                <div
+                  key={item._id}
+                  className="bd-related-card"
+                  onClick={() => openBlog(item.slug)}
+                >
+                  {item.coverImageUrl && (
+                    <img src={item.coverImageUrl} alt={item.title} loading="lazy" />
+                  )}
+                  <div>
+                    <p className="bd-mini-tag">{labelOf(item.category)}</p>
+                    <h3>{item.title}</h3>
+                    <span className="bd-more">
+                      Read <ArrowRight size={14} />
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
 
-      {!unlocked && dialogOpen && (
+      {!unlocked && !checkingAccess && dialogOpen && (
         <PaywallDialog
-          postId={post.id}
-          onUnlocked={() => setUnlockedIds(getUnlocked())}
+          blogId={blog._id}
+          amount={blog.price.amount}
+          onUnlocked={onUnlocked}
           onClose={closeDialog}
         />
       )}

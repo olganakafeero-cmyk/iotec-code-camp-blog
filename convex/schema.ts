@@ -9,6 +9,7 @@ export const blogCategoryValidator = v.union(
 export const blogStatusValidator = v.union(
   v.literal("draft"),
   v.literal("published"),
+  v.literal("archived"),
 );
 
 export const subscriptionModeValidator = v.union(
@@ -16,7 +17,45 @@ export const subscriptionModeValidator = v.union(
   v.literal("paid"),
 );
 
+export const transactionTypeValidator = v.union(
+  v.literal("subscription"),
+  v.literal("withdrawal"),
+);
+
+export const transactionStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("processing"),
+  v.literal("failed"),
+  v.literal("completed"),
+);
+
+export const currencyValidator = v.union(v.literal("UGX"), v.literal("ITX"));
+
 export default defineSchema({
+  transactions: defineTable({
+    blogId: v.id("blogs"),
+    amount: v.number(),
+    currency: currencyValidator,
+    payerEmail: v.string(),
+    payerPhoneNumber: v.string(),
+    payerName: v.optional(v.string()),
+    externalId: v.optional(v.string()),
+    status: transactionStatusValidator,
+    statusMessage: v.optional(v.string()),
+    transactionType: transactionTypeValidator,
+  })
+    .index("by_blogId_and_payerEmail_and_status_and_transactionType", [
+      "blogId",
+      "payerEmail",
+      "status",
+      "transactionType",
+    ])
+    .index("by_blogId_and_payerEmail_and_transactionType", [
+      "blogId",
+      "payerEmail",
+      "transactionType",
+    ]),
+
   blogs: defineTable({
     slug: v.string(),
     title: v.string(),
@@ -51,5 +90,8 @@ export default defineSchema({
       }),
     ),
     updatedAt: v.number(),
-  }),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"])
+    .index("by_status_and_category", ["status", "category"]),
 });

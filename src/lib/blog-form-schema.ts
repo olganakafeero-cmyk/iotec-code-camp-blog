@@ -46,7 +46,9 @@ export const blogFormSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['priceAmount'],
-        message: 'A paid blog needs a price above 0',
+        message: 'A paid blog must cost at least 500',
       })
     }
   })
+      
+    
